@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using TodoApp.Models.Enums;
 
 namespace TodoApp.Models
 {
-    public enum CategoryEnum {
-        BUG,
-        TASK,
-        EPIC
-    }
-
     public class Todo
     {
-        public int Id { get; set; }
         public String Name { get; set; }
         public String Description { get; set; }
         public String Priority { get; set; }
@@ -26,7 +20,6 @@ namespace TodoApp.Models
         public Todo(
             String name,
             String priority,
-            int id  = 0,
             String description = "",
             String responsible = "",
             DateTime? deadline = null,
@@ -40,8 +33,8 @@ namespace TodoApp.Models
             }
 
             Name = name;
+            Priority = priority;
             Responsible = responsible;
-            Id = id;
             Description = description;
             Deadline = (DateTime)deadline;
             Status = status;

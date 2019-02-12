@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.JsonPatch;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Results;
 using TodoApp.Models;
@@ -15,8 +17,8 @@ namespace TodoApp.Controllers
         private static List<Todo> todoList = new List<Todo>
         {
             new Todo(name: "Workout", priority: "minor"),
-            new Todo(id: 1, name: "Go shopping", priority: "major"),
-            new Todo(id: 2, name: "Learn .NET", priority: "critical", status: "in progress", deadline: new DateTime(2019, 05, 11))
+            new Todo(name: "Go shopping", priority: "major"),
+            new Todo(name: "Learn .NET", priority: "critical", status: "in progress", deadline: new DateTime(2019, 05, 11))
         };
 
         // GET: api/todo
@@ -38,17 +40,22 @@ namespace TodoApp.Controllers
         }
 
         // POST: api/todo
-        public void Post([FromBody]string value)
+        public object Post([FromBody] Todo newItem)
         {
-            Todo newItem = JsonConvert.DeserializeObject<Todo>(value);
+            if (newItem.Name == null || newItem.Priority == null)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Error: Invalid post data");
+            }
 
             todoList.Add(newItem);
+            return Request.CreateResponse(HttpStatusCode.OK, "New item added.");
         }
 
         // PATCH: api/todo/5
-        public void Patch(int id, [FromBody]string value)
+        public object Patch(int id, [FromBody] JsonPatchDocument<Todo> todoPatch)
         {
-
+            todoPatch.ApplyTo(todoList[id]);
+            return Request.CreateResponse(HttpStatusCode.OK, "Item pathed.");
         }
 
         // DELETE: api/todo/5
