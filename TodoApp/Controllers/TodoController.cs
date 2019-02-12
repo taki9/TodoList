@@ -12,7 +12,7 @@ namespace TodoApp.Controllers
 {
     public class TodoController : ApiController
     {
-        private List<Todo> todoList = new List<Todo>
+        private static List<Todo> todoList = new List<Todo>
         {
             new Todo(name: "Workout", priority: "minor"),
             new Todo(id: 1, name: "Go shopping", priority: "major"),
