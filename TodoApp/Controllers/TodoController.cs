@@ -22,27 +22,28 @@ namespace TodoApp.Controllers
         };
 
         // GET: api/todo
-        public string Get()
+        public HttpResponseMessage Get()
         {
-            return JsonConvert.SerializeObject(todoList);
+            return Request.CreateResponse(HttpStatusCode.OK, todoList);
         }
 
-        // GET: api/todo/5
-        public string Get(int id)
+        // GET: api/todo/{id}
+        public HttpResponseMessage Get(int id)
         {
             try
             {
-                return JsonConvert.SerializeObject(todoList[id]);
-            } catch (ArgumentOutOfRangeException)
+                return Request.CreateResponse(HttpStatusCode.OK, todoList[id]);
+            }
+            catch (ArgumentOutOfRangeException)
             {
-                return "Error: Invalid id";
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
             }
         }
 
         // POST: api/todo
-        public object Post([FromBody] Todo newItem)
+        public HttpResponseMessage Post([FromBody] Todo newItem)
         {
-            if (newItem.Name == null || newItem.Priority == null)
+            if (String.IsNullOrEmpty(newItem.Name) || String.IsNullOrEmpty(newItem.Priority))
             {
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Error: Invalid post data");
             }
@@ -51,17 +52,25 @@ namespace TodoApp.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, "New item added.");
         }
 
-        // PATCH: api/todo/5
-        public object Patch(int id, [FromBody] JsonPatchDocument<Todo> todoPatch)
+        // PATCH: api/todo/{id}
+        public HttpResponseMessage Patch(int id, [FromBody] JsonPatchDocument<Todo> todoPatch)
         {
-            todoPatch.ApplyTo(todoList[id]);
-            return Request.CreateResponse(HttpStatusCode.OK, "Item pathed.");
+            try
+            {
+                todoPatch.ApplyTo(todoList[id]);
+            } catch (ArgumentOutOfRangeException)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, "Item patched.");
         }
 
-        // DELETE: api/todo/5
-        public void Delete(int id)
+        // DELETE: api/todo/{id}
+        public HttpResponseMessage Delete(int id)
         {
             todoList.RemoveAt(id);
+            return Request.CreateResponse(HttpStatusCode.OK, "Item deleted.");
         }
     }
 }
