@@ -28,11 +28,11 @@ namespace TodoApp.Controllers
         }
 
         // GET: api/todo/{id}
-        public HttpResponseMessage Get(int id)
+        public HttpResponseMessage Get(string id)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, todoList[id]);
+                return Request.CreateResponse(HttpStatusCode.OK, GetTodoById(new Guid(id)));
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -53,11 +53,11 @@ namespace TodoApp.Controllers
         }
 
         // PATCH: api/todo/{id}
-        public HttpResponseMessage Patch(int id, [FromBody] JsonPatchDocument<Todo> todoPatch)
+        public HttpResponseMessage Patch(string id, [FromBody] JsonPatchDocument<Todo> todoPatch)
         {
             try
             {
-                todoPatch.ApplyTo(todoList[id]);
+                todoPatch.ApplyTo(GetTodoById(new Guid(id)));
             } catch (ArgumentOutOfRangeException)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
@@ -67,10 +67,15 @@ namespace TodoApp.Controllers
         }
 
         // DELETE: api/todo/{id}
-        public HttpResponseMessage Delete(int id)
+        public HttpResponseMessage Delete(string id)
         {
-            todoList.RemoveAt(id);
+            todoList.Remove(GetTodoById(new Guid(id)));
             return Request.CreateResponse(HttpStatusCode.OK, "Item deleted.");
+        }
+
+        private Todo GetTodoById(Guid id)
+        {
+            return todoList.Find(item => item.Id == id);
         }
     }
 }

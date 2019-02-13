@@ -8,6 +8,7 @@ namespace TodoApp.Models
 {
     public class Todo
     {
+        public Guid Id { get; set; }
         public String Name { get; set; }
         public String Description { get; set; }
         public String Priority { get; set; }
@@ -32,6 +33,7 @@ namespace TodoApp.Models
                 deadline = DateTime.Now.AddDays(1);
             }
 
+            Id = Guid.NewGuid();
             Name = name;
             Priority = priority;
             Responsible = responsible;
