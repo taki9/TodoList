@@ -1,81 +1,132 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Web.Http;
-using System.Web.Http.Results;
 using TodoApp.Models;
+using TodoApp.Models.Enums;
 
 namespace TodoApp.Controllers
 {
     public class TodoController : ApiController
     {
+
         private static List<Todo> todoList = new List<Todo>
         {
-            new Todo(name: "Workout", priority: "minor"),
-            new Todo(name: "Go shopping", priority: "major"),
-            new Todo(name: "Learn .NET", priority: "critical", status: "in progress", deadline: new DateTime(2019, 05, 11))
+            new Todo {
+                Id = Guid.NewGuid(),
+                Name = "Workout",
+                Description = "",
+                Priority = "minor",
+                Responsible = "John Snow",
+                Deadline = DateTime.Now.AddDays(1),
+                Status = "todo",
+                Category = CategoryEnum.TASK,
+                ParentId = 0,
+            },
+            new Todo {
+                Id = Guid.NewGuid(),
+                Name = "Go shopping",
+                Description = "",
+                Priority = "major",
+                Responsible = "Bran Stark",
+                Deadline = DateTime.Now.AddHours(3),
+                Status = "todo",
+                Category = CategoryEnum.TASK,
+                ParentId = 0
+            },
+            new Todo {
+                Id = Guid.NewGuid(),
+                Name = "Learn .NET",
+                Description = "",
+                Priority = "critical",
+                Responsible = "Varys",
+                Deadline = new DateTime(2019, 05, 11),
+                Status = "in progress",
+                Category = CategoryEnum.EPIC,
+                ParentId = 0
+            }
         };
 
         // GET: api/todo
-        public HttpResponseMessage Get()
+        public IHttpActionResult Get()
         {
-            return Request.CreateResponse(HttpStatusCode.OK, todoList);
+            return Ok(todoList);
         }
 
         // GET: api/todo/{id}
-        public HttpResponseMessage Get(string id)
+        public IHttpActionResult Get(string id)
         {
-            try
+            Todo item = GetTodoById(id);
+
+            if (item != null)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, GetTodoById(new Guid(id)));
+                return Ok(item);
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
-            }
+            
+            return Content(HttpStatusCode.NotFound, "Invalid id");
         }
 
         // POST: api/todo
-        public HttpResponseMessage Post([FromBody] Todo newItem)
+        public IHttpActionResult Post([FromBody] Todo newItem)
         {
             if (String.IsNullOrEmpty(newItem.Name) || String.IsNullOrEmpty(newItem.Priority))
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Error: Invalid post data");
+                return Content(HttpStatusCode.NotFound, "Invalid post data");
             }
 
             todoList.Add(newItem);
-            return Request.CreateResponse(HttpStatusCode.OK, "New item added.");
+            return Ok("New item added.");
         }
 
         // PATCH: api/todo/{id}
-        public HttpResponseMessage Patch(string id, [FromBody] JsonPatchDocument<Todo> todoPatch)
+        public IHttpActionResult Patch(string id, [FromBody] Todo todoPatch)
         {
-            try
+            Todo item = GetTodoById(id);
+
+            if (item != null)
             {
-                todoPatch.ApplyTo(GetTodoById(new Guid(id)));
-            } catch (ArgumentOutOfRangeException)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
+                item.Name = todoPatch.Name;
+                item.Description = todoPatch.Description;
+                item.Deadline = todoPatch.Deadline;
+                item.Category = todoPatch.Category;
+                item.ParentId = todoPatch.ParentId;
+                item.Responsible = todoPatch.Responsible;
+                item.Priority = todoPatch.Priority;
+                item.Status = todoPatch.Status;
+
+                return Ok("Item patched.");
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, "Item patched.");
+            return Content(HttpStatusCode.NotFound, "Invalid id");
         }
 
         // DELETE: api/todo/{id}
-        public HttpResponseMessage Delete(string id)
+        public IHttpActionResult Delete(string id)
         {
-            todoList.Remove(GetTodoById(new Guid(id)));
-            return Request.CreateResponse(HttpStatusCode.OK, "Item deleted.");
+            Todo item = GetTodoById(id);
+
+            if (item != null)
+            {
+                todoList.Remove(GetTodoById(id));
+                return Ok("Item deleted.");
+            }
+
+            return Content(HttpStatusCode.NotFound, "Invalid id");
         }
 
-        private Todo GetTodoById(Guid id)
+        private Todo GetTodoById(string id)
         {
-            return todoList.Find(item => item.Id == id);
+            try
+            {
+                Guid guid = Guid.Parse(id);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+
+            return todoList.Find(item => item.Id == new Guid(id));
         }
     }
 }
