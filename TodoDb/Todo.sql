@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Todo]
 (
-	[Id] INT NOT NULL PRIMARY KEY, 
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY, 
     [Name] NVARCHAR(50) NOT NULL, 
     [Description] NVARCHAR(MAX) NULL, 
     [Priority] NVARCHAR(50) NOT NULL, 

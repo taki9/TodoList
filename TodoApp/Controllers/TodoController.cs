@@ -1,64 +1,25 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
-using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System;
+using System.Data.Entity;
+using System.Linq;
 using System.Web.Http;
 using TodoApp.Models;
-using TodoApp.Models.Enums;
 
 namespace TodoApp.Controllers
 {
     public class TodoController : ApiController
     {
-
-        private static List<Todo> todoList = new List<Todo>
-        {
-            new Todo {
-                Id = Guid.NewGuid(),
-                Name = "Workout",
-                Description = "",
-                Priority = "minor",
-                Responsible = "John Snow",
-                Deadline = DateTime.Now.AddDays(1),
-                Status = "todo",
-                Category = CategoryEnum.TASK,
-                ParentId = 0,
-            },
-            new Todo {
-                Id = Guid.NewGuid(),
-                Name = "Go shopping",
-                Description = "",
-                Priority = "major",
-                Responsible = "Bran Stark",
-                Deadline = DateTime.Now.AddHours(3),
-                Status = "todo",
-                Category = CategoryEnum.TASK,
-                ParentId = 0
-            },
-            new Todo {
-                Id = Guid.NewGuid(),
-                Name = "Learn .NET",
-                Description = "",
-                Priority = "critical",
-                Responsible = "Varys",
-                Deadline = new DateTime(2019, 05, 11),
-                Status = "in progress",
-                Category = CategoryEnum.EPIC,
-                ParentId = 0
-            }
-        };
+        private TodoDataEntities db = new TodoDataEntities();
 
         // GET: api/todo
         public IHttpActionResult Get()
         {
-            return Ok(todoList);
+            return Ok(db.Todo);
         }
 
         // GET: api/todo/{id}
         public IHttpActionResult Get(Guid id)
         {
-            Todo todo = todoList.Find(item => item.Id == id);
-
+            Todo todo = db.Todo.Find(id);
             if (todo is null)
             {
                 return NotFound();
@@ -70,33 +31,34 @@ namespace TodoApp.Controllers
         // POST: api/todo
         public IHttpActionResult Post([FromBody] Todo newItem)
         {
-            if (String.IsNullOrEmpty(newItem.Name) || String.IsNullOrEmpty(newItem.Priority))
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest(ModelState);
             }
 
-            todoList.Add(newItem);
+            db.Todo.Add(newItem);
+            db.SaveChanges();
+
             return Ok("New item added.");
         }
 
         // PATCH: api/todo/{id}
         public IHttpActionResult Patch(Guid id, [FromBody] Todo todoPatch)
         {
-            Todo todo = todoList.Find(item => item.Id == id);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Todo todo = db.Todo.Find(id);
 
             if (todo is null)
             {
                 return NotFound();
             }
 
-            todo.Name = todoPatch.Name;
-            todo.Description = todoPatch.Description;
-            todo.Deadline = todoPatch.Deadline;
-            todo.Category = todoPatch.Category;
-            todo.ParentId = todoPatch.ParentId;
-            todo.Responsible = todoPatch.Responsible;
-            todo.Priority = todoPatch.Priority;
-            todo.Status = todoPatch.Status;
+            db.Entry(todoPatch).State = EntityState.Modified;
+            db.SaveChanges();
 
             return Ok("Item patched.");
         }
@@ -104,14 +66,15 @@ namespace TodoApp.Controllers
         // DELETE: api/todo/{id}
         public IHttpActionResult Delete(Guid id)
         {
-            Todo todo = todoList.Find(item => item.Id == id);
-
+            Todo todo = db.Todo.Find(id);
             if (todo is null)
             {
                 return NotFound();
             }
 
-            todoList.Remove(todo);
+            db.Todo.Remove(todo);
+            db.SaveChanges();
+
             return Ok("Item deleted.");
         }
     }

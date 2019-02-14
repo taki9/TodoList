@@ -58,6 +58,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -173,7 +174,24 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Enums\CategoryEnum.cs" />
-    <Compile Include="Models\Todo.cs" />
+    <Compile Include="Models\Todo.cs">
+      <DependentUpon>TodoModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TodoModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TodoModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TodoModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TodoModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\TodoModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TodoModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +216,16 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <Content Include="Models\TodoModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>TodoModel.edmx</DependentUpon>
+      <LastGenOutput>TodoModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\TodoModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>TodoModel.edmx</DependentUpon>
+      <LastGenOutput>TodoModel.cs</LastGenOutput>
+    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -211,7 +239,17 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <EntityDeploy Include="Models\TodoModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>TodoModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\TodoModel.edmx.diagram">
+      <DependentUpon>TodoModel.edmx</DependentUpon>
+    </Content>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
