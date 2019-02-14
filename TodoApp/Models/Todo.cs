@@ -29,7 +29,5 @@ namespace TodoApp.Models
         public CategoryEnum Category { get; set; }
 
         public int ParentId { get; set; }
-
-        public Todo() { }
     }
 }

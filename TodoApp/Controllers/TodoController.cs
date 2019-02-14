@@ -55,16 +55,16 @@ namespace TodoApp.Controllers
         }
 
         // GET: api/todo/{id}
-        public IHttpActionResult Get(string id)
+        public IHttpActionResult Get(Guid id)
         {
-            Todo item = GetTodoById(id);
+            Todo todo = todoList.Find(item => item.Id == id);
 
-            if (item != null)
+            if (todo is null)
             {
-                return Ok(item);
+                return NotFound();
             }
-            
-            return Content(HttpStatusCode.NotFound, "Invalid id");
+
+            return Ok(todo);
         }
 
         // POST: api/todo
@@ -72,7 +72,7 @@ namespace TodoApp.Controllers
         {
             if (String.IsNullOrEmpty(newItem.Name) || String.IsNullOrEmpty(newItem.Priority))
             {
-                return Content(HttpStatusCode.NotFound, "Invalid post data");
+                return NotFound();
             }
 
             todoList.Add(newItem);
@@ -80,53 +80,39 @@ namespace TodoApp.Controllers
         }
 
         // PATCH: api/todo/{id}
-        public IHttpActionResult Patch(string id, [FromBody] Todo todoPatch)
+        public IHttpActionResult Patch(Guid id, [FromBody] Todo todoPatch)
         {
-            Todo item = GetTodoById(id);
+            Todo todo = todoList.Find(item => item.Id == id);
 
-            if (item != null)
+            if (todo is null)
             {
-                item.Name = todoPatch.Name;
-                item.Description = todoPatch.Description;
-                item.Deadline = todoPatch.Deadline;
-                item.Category = todoPatch.Category;
-                item.ParentId = todoPatch.ParentId;
-                item.Responsible = todoPatch.Responsible;
-                item.Priority = todoPatch.Priority;
-                item.Status = todoPatch.Status;
-
-                return Ok("Item patched.");
+                return NotFound();
             }
 
-            return Content(HttpStatusCode.NotFound, "Invalid id");
+            todo.Name = todoPatch.Name;
+            todo.Description = todoPatch.Description;
+            todo.Deadline = todoPatch.Deadline;
+            todo.Category = todoPatch.Category;
+            todo.ParentId = todoPatch.ParentId;
+            todo.Responsible = todoPatch.Responsible;
+            todo.Priority = todoPatch.Priority;
+            todo.Status = todoPatch.Status;
+
+            return Ok("Item patched.");
         }
 
         // DELETE: api/todo/{id}
-        public IHttpActionResult Delete(string id)
+        public IHttpActionResult Delete(Guid id)
         {
-            Todo item = GetTodoById(id);
+            Todo todo = todoList.Find(item => item.Id == id);
 
-            if (item != null)
+            if (todo is null)
             {
-                todoList.Remove(GetTodoById(id));
-                return Ok("Item deleted.");
+                return NotFound();
             }
 
-            return Content(HttpStatusCode.NotFound, "Invalid id");
-        }
-
-        private Todo GetTodoById(string id)
-        {
-            try
-            {
-                Guid guid = Guid.Parse(id);
-            }
-            catch (FormatException)
-            {
-                return null;
-            }
-
-            return todoList.Find(item => item.Id == new Guid(id));
+            todoList.Remove(todo);
+            return Ok("Item deleted.");
         }
     }
 }
