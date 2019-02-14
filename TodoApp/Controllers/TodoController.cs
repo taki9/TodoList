@@ -8,18 +8,18 @@ namespace TodoApp.Controllers
 {
     public class TodoController : ApiController
     {
-        private TodoDataEntities db = new TodoDataEntities();
+        private TodoContext db = new TodoContext();
 
         // GET: api/todo
         public IHttpActionResult Get()
         {
-            return Ok(db.Todo);
+            return Ok(db.Todos);
         }
 
         // GET: api/todo/{id}
         public IHttpActionResult Get(Guid id)
         {
-            Todo todo = db.Todo.Find(id);
+            Todo todo = db.Todos.Find(id);
             if (todo is null)
             {
                 return NotFound();
@@ -36,7 +36,7 @@ namespace TodoApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            db.Todo.Add(newItem);
+            db.Todos.Add(newItem);
             db.SaveChanges();
 
             return Ok("New item added.");
@@ -50,7 +50,7 @@ namespace TodoApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            Todo todo = db.Todo.Find(id);
+            Todo todo = db.Todos.Find(id);
 
             if (todo is null)
             {
@@ -66,13 +66,13 @@ namespace TodoApp.Controllers
         // DELETE: api/todo/{id}
         public IHttpActionResult Delete(Guid id)
         {
-            Todo todo = db.Todo.Find(id);
+            Todo todo = db.Todos.Find(id);
             if (todo is null)
             {
                 return NotFound();
             }
 
-            db.Todo.Remove(todo);
+            db.Todos.Remove(todo);
             db.SaveChanges();
 
             return Ok("Item deleted.");

@@ -173,25 +173,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\TodoContext.cs" />
+    <Compile Include="Models\Todo.cs" />
     <Compile Include="Models\Enums\CategoryEnum.cs" />
-    <Compile Include="Models\Todo.cs">
-      <DependentUpon>TodoModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\TodoModel.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TodoModel.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\TodoModel.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TodoModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\TodoModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TodoModel.edmx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -216,16 +200,6 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
-    <Content Include="Models\TodoModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>TodoModel.edmx</DependentUpon>
-      <LastGenOutput>TodoModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\TodoModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>TodoModel.edmx</DependentUpon>
-      <LastGenOutput>TodoModel.cs</LastGenOutput>
-    </Content>
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -239,13 +213,6 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <EntityDeploy Include="Models\TodoModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>TodoModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Models\TodoModel.edmx.diagram">
-      <DependentUpon>TodoModel.edmx</DependentUpon>
-    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

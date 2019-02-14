@@ -2,7 +2,7 @@
 (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY, 
     [Name] NVARCHAR(50) NOT NULL, 
-    [Description] NVARCHAR(MAX) NULL, 
+    [Description] NVARCHAR(500) NULL, 
     [Priority] NVARCHAR(50) NOT NULL, 
     [Responsible] NVARCHAR(50) NULL, 
     [Deadline] DATETIME NULL, 
