@@ -1,76 +1,65 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
+﻿using System;
 using System.Web.Http;
-using System.Web.Http.Results;
 using TodoApp.Models;
+using TodoService;
 
 namespace TodoApp.Controllers
 {
     public class TodoController : ApiController
     {
-        private static List<Todo> todoList = new List<Todo>
-        {
-            new Todo(name: "Workout", priority: "minor"),
-            new Todo(name: "Go shopping", priority: "major"),
-            new Todo(name: "Learn .NET", priority: "critical", status: "in progress", deadline: new DateTime(2019, 05, 11))
-        };
+        private TodoManager manager = new TodoManager();
 
         // GET: api/todo
-        public HttpResponseMessage Get()
+        public IHttpActionResult Get()
         {
-            return Request.CreateResponse(HttpStatusCode.OK, todoList);
+            return Ok(manager.GetAllTodo());
         }
 
         // GET: api/todo/{id}
-        public HttpResponseMessage Get(int id)
+        public IHttpActionResult Get(Guid id)
         {
-            try
+            Todo todo = manager.GetTodo(id);
+
+            if (todo == null)
             {
-                return Request.CreateResponse(HttpStatusCode.OK, todoList[id]);
+                return NotFound();
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
-            }
+
+            return Ok(todo);
         }
 
         // POST: api/todo
-        public HttpResponseMessage Post([FromBody] Todo newItem)
+        public IHttpActionResult Post([FromBody] Todo newItem)
         {
-            if (String.IsNullOrEmpty(newItem.Name) || String.IsNullOrEmpty(newItem.Priority))
+            if (!ModelState.IsValid)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Error: Invalid post data");
+                return BadRequest();
             }
 
-            todoList.Add(newItem);
-            return Request.CreateResponse(HttpStatusCode.OK, "New item added.");
+            manager.AddTodo(newItem);
+
+            return Ok("New item added.");
         }
 
         // PATCH: api/todo/{id}
-        public HttpResponseMessage Patch(int id, [FromBody] JsonPatchDocument<Todo> todoPatch)
+        public IHttpActionResult Patch(Guid id, [FromBody] Todo todoPatch)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                todoPatch.ApplyTo(todoList[id]);
-            } catch (ArgumentOutOfRangeException)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Error: Invalid id");
+                return BadRequest();
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, "Item patched.");
+            bool isPatched = manager.PatchTodo(id, todoPatch);
+
+            return isPatched ? (IHttpActionResult)Ok("Item patched.") : NotFound();
         }
 
         // DELETE: api/todo/{id}
-        public HttpResponseMessage Delete(int id)
+        public IHttpActionResult Delete(Guid id)
         {
-            todoList.RemoveAt(id);
-            return Request.CreateResponse(HttpStatusCode.OK, "Item deleted.");
+            bool isDeleted = manager.DeleteTodo(id);
+
+            return isDeleted ? (IHttpActionResult)Ok("Item deleted.") : NotFound();
         }
     }
 }
