@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Data.Entity;
-using System.Linq;
 using System.Web.Http;
 using TodoApp.Models;
+using TodoService;
 
 namespace TodoApp.Controllers
 {
     public class TodoController : ApiController
     {
-        private TodoContext db = new TodoContext();
+        private TodoManager manager = new TodoManager();
 
         // GET: api/todo
         public IHttpActionResult Get()
         {
-            return Ok(db.Todos);
+            return Ok(manager.GetAllTodo());
         }
 
         // GET: api/todo/{id}
         public IHttpActionResult Get(Guid id)
         {
-            Todo todo = db.Todos.Find(id);
-            if (todo is null)
+            Todo todo = manager.GetTodo(id);
+
+            if (todo == null)
             {
                 return NotFound();
             }
@@ -33,11 +33,10 @@ namespace TodoApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
-            db.Todos.Add(newItem);
-            db.SaveChanges();
+            manager.AddTodo(newItem);
 
             return Ok("New item added.");
         }
@@ -47,35 +46,20 @@ namespace TodoApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
-            Todo todo = db.Todos.Find(id);
+            bool isPatched = manager.PatchTodo(id, todoPatch);
 
-            if (todo is null)
-            {
-                return NotFound();
-            }
-
-            db.Entry(todoPatch).State = EntityState.Modified;
-            db.SaveChanges();
-
-            return Ok("Item patched.");
+            return isPatched ? (IHttpActionResult)Ok("Item patched.") : NotFound();
         }
 
         // DELETE: api/todo/{id}
         public IHttpActionResult Delete(Guid id)
         {
-            Todo todo = db.Todos.Find(id);
-            if (todo is null)
-            {
-                return NotFound();
-            }
+            bool isDeleted = manager.DeleteTodo(id);
 
-            db.Todos.Remove(todo);
-            db.SaveChanges();
-
-            return Ok("Item deleted.");
+            return isDeleted ? (IHttpActionResult)Ok("Item deleted.") : NotFound();
         }
     }
 }

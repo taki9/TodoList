@@ -7,7 +7,7 @@ namespace TodoApp.Models
 {
     public class Todo
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public Guid Id { get; set; }
         [Required]
         [StringLength(50)]
@@ -19,7 +19,7 @@ namespace TodoApp.Models
         public string Priority { get; set; }
         [StringLength(50)]
         public string Responsible { get; set; }
-        public Nullable<System.DateTime> Deadline { get; set; }
+        public Nullable<DateTime> Deadline { get; set; }
         [StringLength(50)]
         public string Status { get; set; }
         public Nullable<int> Category { get; set; }
